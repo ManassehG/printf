@@ -1,48 +1,61 @@
 #include "main.h"
-#include <stdarg.h>
-#include <unistd.h>
 
 /**
- * _printf - function to print according to format
- * @format: input characters to be printed
- * Return: The number of characters printed.
+ * _printf - Printf function
+ * @format: format.
+ * Return: Printed chars.
  */
 
 int _printf(const char *format, ...)
 {
-	int i = 0, count = 0, count_fun;
+	int i, printed = 0, printed_chars = 0;
+	int flags, wid, prec, len, buffer_t = 0;
 	va_list args;
+	char buffer[BUFF_SIZE];
 
+	if (format == NULL)
+		return (-1);
 	va_start(args, format);
-	if (!format || (format[0] == '%' && !format[1]))
-		return (-1);
-	if (format[0] == '%' && format[1] == ' ' && !format[2])
-		return (-1);
-	while (format[i])
+	for (i = 0; format && format[i] != '\0'; i++)
 	{
-		count_fun = 0;
-		if (format[i] == '%')
+		if (format[i] != '%')
 		{
-			if (!format[i + 1] || (format[i + 1] == ' ' && !format[i + 2]))
-			{
-				count = -1;
-				break;
-			}
-			count_fun += get_function(format[i + 1], args);
-			if (count_fun == 0)
-				count += _putchar(format[i + 1]);
-			if (count_fun == -1)
-				count = -1;
-			i++;
+			buffer[buffer_t++] = format[i];
+			if (buffer_t == BUFF_SIZE)
+				print_buffer(buffer, &buffer_t);
+			printed_chars++;
 		}
 		else
 		{
-			(count == -1) ? (_putchar(format[i])) : (count += _putchar(format[i]));
+			print_buffer(buffer, &buffer_t);
+			flags = get_flags(format, &i);
+			wid = get_width(format, &i, args);
+			prec = get_precision(format, &i, args);
+			len = get_size(format, &i);
+			++i;
+			printed = handle_print(format, &i, args, buffer,
+					flags, wid, prec, len);
+			if (printed == -1)
+				return (-1);
+			printed_chars += printed;
 		}
-		i++;
-		if (count != -1)
-			count += count_fun;
 	}
+	print_buffer(buffer, &buffer_t);
 	va_end(args);
-	return (count);
+	return (printed_chars);
+}
+
+
+
+/**
+ * print_buffer - Prints the contents of the buffer if it exist
+ * @buffer: Array of chars
+ * @buff_ind: Index at which to add next char, represents the length.
+ */
+
+void print_buffer(char buffer[], int *buffer_t)
+{
+	if (*buffer_t > 0)
+		write(1, &buffer[0], *buffer_t);
+	*buffer_t = 0;
 }
