@@ -36,9 +36,6 @@ struct fmt
 };
 
 
-
-
-
 /**
  * typedef struct fmt fmt_t - Struct op
  * @fmt: The format.
@@ -114,7 +111,7 @@ int print_reverse(va_list types, char buffer[], int flags, int width,
 int print_rot13string(va_list types, char buffer[], int flags, int width,
 		int precision, int size);
 
-/* width handler */
+/* Handle Write */
 
 int handle_write_char(char c, char buffer[], int flags, int width,
 		int precision, int size);
@@ -129,7 +126,7 @@ int write_unsgnd(int is_negative, int ind, char buffer[], int flags,
 
 
 
-/****************** UTILS ******************/
+/****************** Convert ******************/
 
 int is_printable(char);
 int append_hexa_code(char, char[], int);
